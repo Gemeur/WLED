@@ -1,4 +1,3 @@
-#include "../usermods/usermod_cpufreq.h"
 #include "wled.h"
 /*
  * This v1 usermod file allows you to add own functionality to WLED more easily
