@@ -6,7 +6,7 @@ class CpuFreqUsermod : public Usermod {
   private:
     unsigned long lastCheck = 0;
     uint8_t currentFreq = 240;
-    uint16_t maxFreq = 240;
+    uint8_t maxFreq = 240;          
     bool enabled = true;
 
     bool allSegmentsIdle() const {
@@ -21,7 +21,8 @@ class CpuFreqUsermod : public Usermod {
 
   public:
     void setup() override {
-      if (maxFreq != 160 && maxFreq != 240) maxFreq = 240;
+      
+      if (maxFreq != 80 && maxFreq != 160 && maxFreq != 240) maxFreq = 240;
       if (enabled) {
         setCpuFrequencyMhz(maxFreq);
         currentFreq = maxFreq;
@@ -45,18 +46,36 @@ class CpuFreqUsermod : public Usermod {
       return 0x1234;
     }
 
+    
+    void addToInfo(JsonObject& root) override {
+      if (!enabled) return; 
+      root["CPU Freq"] = String(currentFreq) + " MHz";
+    }
+
     void addToConfig(JsonObject& root) override {
       JsonObject top = root.createNestedObject("CpuFreq");
       top["enabled"] = enabled;
-      top["maxFreqMHz"] = maxFreq;
+      
+      
+      JsonObject freqObj = top.createNestedObject("maxFreqMHz");
+      freqObj["label"] = "Макс. частота, МГц";
+      freqObj["type"] = "select";
+      freqObj["options"] = "80,160,240";
+      freqObj["value"] = maxFreq;
     }
 
     bool readFromConfig(JsonObject& root) override {
       JsonObject top = root["CpuFreq"];
       bool configComplete = !top.isNull();
       configComplete &= getJsonValue(top["enabled"], enabled, true);
-      configComplete &= getJsonValue(top["maxFreqMHz"], maxFreq, 240);
-      if (maxFreq != 160 && maxFreq != 240) maxFreq = 240;
+      int tempFreq = 240;
+      configComplete &= getJsonValue(top["maxFreqMHz"], tempFreq, 240);
+      if (tempFreq == 80 || tempFreq == 160 || tempFreq == 240) {
+        maxFreq = (uint8_t)tempFreq;
+      } else {
+        maxFreq = 240;
+      }
+      
       return configComplete;
     }
 };
