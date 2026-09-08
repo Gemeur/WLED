@@ -1,8 +1,17 @@
 name: Build WLED with custom usermods
 
 on:
-  workflow_dispatch:    # запуск вручную через кнопку
-
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Ветка для сборки'
+        required: true
+        default: '16_x'
+        type: choice
+        options:
+          - main
+          - 16_x
+          - stable
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,6 +19,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: '16_x'  
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -22,8 +33,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install PlatformIO
-        run: |
-          pip install platformio
+        run: pip install platformio
 
       - name: Install dependencies and build web UI
         run: |
@@ -31,8 +41,7 @@ jobs:
           npm run build
 
       - name: Build firmware
-        run: |
-          pio run -e custom_build
+        run: pio run -e custom_build
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
