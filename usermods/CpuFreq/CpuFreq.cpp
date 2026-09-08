@@ -6,7 +6,7 @@ class CpuFreqUsermod : public Usermod {
   private:
     unsigned long lastCheck = 0;
     uint8_t currentFreq = 240;
-    uint8_t maxFreq = 240;          
+    uint8_t maxFreq = 240;          // 80, 160 или 240
     bool enabled = true;
 
     bool allSegmentsIdle() const {
@@ -21,7 +21,6 @@ class CpuFreqUsermod : public Usermod {
 
   public:
     void setup() override {
-      
       if (maxFreq != 80 && maxFreq != 160 && maxFreq != 240) maxFreq = 240;
       if (enabled) {
         setCpuFrequencyMhz(maxFreq);
@@ -46,16 +45,15 @@ class CpuFreqUsermod : public Usermod {
       return 0x1234;
     }
 
-    
-    void addToInfo(JsonObject& root) override {
-      if (!enabled) return; 
+    // Без override – компилируется во всех версиях WLED
+    void addToInfo(JsonObject& root) {
+      if (!enabled) return;
       root["CPU Freq"] = String(currentFreq) + " MHz";
     }
 
     void addToConfig(JsonObject& root) override {
       JsonObject top = root.createNestedObject("CpuFreq");
       top["enabled"] = enabled;
-      
       
       JsonObject freqObj = top.createNestedObject("maxFreqMHz");
       freqObj["label"] = "Макс. частота, МГц";
@@ -68,6 +66,7 @@ class CpuFreqUsermod : public Usermod {
       JsonObject top = root["CpuFreq"];
       bool configComplete = !top.isNull();
       configComplete &= getJsonValue(top["enabled"], enabled, true);
+      
       int tempFreq = 240;
       configComplete &= getJsonValue(top["maxFreqMHz"], tempFreq, 240);
       if (tempFreq == 80 || tempFreq == 160 || tempFreq == 240) {
@@ -75,7 +74,6 @@ class CpuFreqUsermod : public Usermod {
       } else {
         maxFreq = 240;
       }
-      
       return configComplete;
     }
 };
