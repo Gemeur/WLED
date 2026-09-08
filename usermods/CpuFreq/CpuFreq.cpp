@@ -5,7 +5,7 @@
 class CpuFreqUsermod : public Usermod {
   private:
     unsigned long lastCheck = 0;
-    uint8_t  currentFreq = 240;
+    uint8_t currentFreq = 240;
     uint16_t maxFreq = 240;
     bool enabled = true;
 
@@ -62,6 +62,6 @@ class CpuFreqUsermod : public Usermod {
 };
 
 static CpuFreqUsermod cpu_freq_usermod;
-REGISTER_USERMOD(cpu_freq_usermod);   // ← точка с запятой добавлена
+REGISTER_USERMOD(cpu_freq_usermod);
 
 #endif // ESP32
