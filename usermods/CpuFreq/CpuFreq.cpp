@@ -1,16 +1,14 @@
-#pragma once
 #include "wled.h"
 
-#ifdef ESP32  
+#ifdef ESP32
 
 class CpuFreqUsermod : public Usermod {
   private:
     unsigned long lastCheck = 0;
     uint8_t  currentFreq = 240;
     uint16_t maxFreq = 240;
-    bool enabled = true;  
+    bool enabled = true;
 
-    
     bool allSegmentsIdle() const {
       if (bri == 0) return true;
       for (uint8_t i = 0; i < strip.getSegmentsNum(); i++) {
@@ -43,9 +41,8 @@ class CpuFreqUsermod : public Usermod {
       }
     }
 
-    
     uint16_t getId() override {
-      return 0x1234;  
+      return 0x1234;
     }
 
     void addToConfig(JsonObject& root) override {
@@ -65,6 +62,6 @@ class CpuFreqUsermod : public Usermod {
 };
 
 static CpuFreqUsermod cpu_freq_usermod;
-REGISTER_USERMOD(cpu_freq_usermod)
+REGISTER_USERMOD(cpu_freq_usermod);   // ← точка с запятой добавлена
 
 #endif // ESP32
